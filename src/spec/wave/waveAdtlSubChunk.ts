@@ -11,13 +11,11 @@ export function ReadWaveAdtlSubChunk(chunk: RiffChunk): WaveAdtlSubChunk {
 
 	let chunkSearchOffset = 0;
 
-	console.log("scanning adtl")
-
 	while (true) {
 		const view = new DataView(chunk.buffer.buffer, chunkSearchOffset);
 
 		if ((chunkSearchOffset + 1) >= (chunk.riffChunkEnd - chunk.riffChunkStart)) {
-			console.log(`reached end of adtl`)
+			// console.log(`reached end of adtl`)
 			break;
 		}
 
@@ -37,8 +35,6 @@ export function ReadWaveAdtlSubChunk(chunk: RiffChunk): WaveAdtlSubChunk {
 				chunk.buffer.subarray(chunkSearchOffset + 12, chunkSearchOffset + lablChunkSize + 7)
 			)
 		);
-
-		console.log(label)
 
 		lablSubChunk.labels.set(identifier, label)
 
