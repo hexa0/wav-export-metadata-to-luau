@@ -3,6 +3,7 @@ import { assert } from "../../util/logic/assert";
 export interface RiffChunk {
 	buffer: Buffer;
 	riffLabel: number;
+	riffLabelString: string;
 	riffChunkStart: number;
 	riffChunkEnd: number;
 }
@@ -11,7 +12,10 @@ export interface RiffHeader {
 	watermark: number;
 	dataSize: number;
 	type: number;
-	chunks: Map<string, RiffChunk>;
+	chunksByName: Map<string, RiffChunk>;
+	chunksByIndex: Array<RiffChunk>;
+	subChunksByName: Map<string, RiffChunk>;
+	subChunksByIndex: Array<RiffChunk>;
 }
 
 const DUMMY_BUFFER = Buffer.alloc(0);
@@ -31,7 +35,10 @@ export function ReadRiffHeader(buffer: Buffer): RiffHeader {
 	riff.dataSize = view.getUint32(4, true);
 	riff.type = view.getUint32(8, true);
 
-	riff.chunks = new Map<string, RiffChunk>();
+	riff.chunksByName = new Map<string, RiffChunk>();
+	riff.chunksByIndex = new Array<RiffChunk>();
+	riff.subChunksByName = new Map<string, RiffChunk>();
+	riff.subChunksByIndex = new Array<RiffChunk>();
 
 	let chunkSearchOffset = 12;
 
@@ -40,14 +47,19 @@ export function ReadRiffHeader(buffer: Buffer): RiffHeader {
 			break;
 		}
 
-		const label = String.fromCharCode(
+		const rawLabel = String.fromCharCode(
 			...new Uint8Array(
 				buffer.subarray(chunkSearchOffset, chunkSearchOffset + 4)
 			)
-		).replaceAll(" ", "");
+		);
+
+		const label = rawLabel.replaceAll(" ", "");
+
+		console.log(`found chunk "${rawLabel}" at offset ${chunkSearchOffset}`);
 
 		const chunk: RiffChunk = {
 			buffer: DUMMY_BUFFER,
+			riffLabelString: rawLabel,
 			riffLabel: view.getUint32(chunkSearchOffset, true),
 			riffChunkStart: chunkSearchOffset + 8,
 			riffChunkEnd:
@@ -57,12 +69,45 @@ export function ReadRiffHeader(buffer: Buffer): RiffHeader {
 		};
 
 		chunk.buffer = Buffer.alloc(chunk.riffChunkEnd - chunk.riffChunkStart);
-		chunk.buffer.set(buffer.subarray(chunk.riffChunkStart, chunk.riffChunkEnd));
+		chunk.buffer.set(
+			buffer.subarray(chunk.riffChunkStart, chunk.riffChunkEnd)
+		);
 
-		if (!riff.chunks.get(label)) {
-			riff.chunks.set(label, chunk);
+		if (!riff.chunksByName.get(label)) {
+			riff.chunksByName.set(label, chunk);
 		} else {
-			riff.chunks.set(label + chunkSearchOffset, chunk);
+			riff.chunksByName.set(label + chunkSearchOffset, chunk);
+		}
+
+		riff.chunksByIndex.push(chunk)
+
+		if (rawLabel.toLowerCase() == "list") {
+			const subChunkLabel = String.fromCharCode(
+				...new Uint8Array(
+					buffer.subarray(chunkSearchOffset + 8, chunkSearchOffset + 12)
+				)
+			);
+
+			const subChunk: RiffChunk = {
+				buffer: DUMMY_BUFFER,
+				riffLabelString: subChunkLabel,
+				riffLabel: view.getUint32(chunkSearchOffset + 8, true),
+				riffChunkStart: chunk.riffChunkStart + 4,
+				riffChunkEnd: chunk.riffChunkEnd
+			}
+
+			subChunk.buffer = Buffer.alloc(subChunk.riffChunkEnd - subChunk.riffChunkStart);
+			subChunk.buffer.set(
+				buffer.subarray(subChunk.riffChunkStart, subChunk.riffChunkEnd)
+			);
+
+			if (!riff.subChunksByName.get(subChunkLabel)) {
+				riff.subChunksByName.set(subChunkLabel, subChunk);
+			} else {
+				riff.subChunksByName.set(subChunkLabel + chunkSearchOffset, subChunk);
+			}
+
+			riff.subChunksByIndex.push(subChunk)
 		}
 
 		chunkSearchOffset = chunk.riffChunkEnd;
@@ -74,7 +119,7 @@ export function ReadRiffHeader(buffer: Buffer): RiffHeader {
 export function RiffInterfaceToBuffer(riff: RiffHeader) {
 	let dataSize = 0;
 
-	riff.chunks.forEach((chunk) => {
+	riff.chunksByName.forEach((chunk) => {
 		dataSize += chunk.buffer.length + 8;
 	});
 
@@ -87,7 +132,7 @@ export function RiffInterfaceToBuffer(riff: RiffHeader) {
 
 	let chunkOffset = 12;
 
-	riff.chunks.forEach((chunk) => {
+	riff.chunksByName.forEach((chunk) => {
 		// console.log(chunkOffset)
 		// console.log(chunk.buffer.length)
 		view.setUint32(chunkOffset, chunk.riffLabel, true);

@@ -1,22 +1,24 @@
 {
-	"name": "wrap-remainder-loop",
+	"name": "wav-export-markers-to-json",
 	"version": "1.0.0",
-	"main": "dist/index.js",
-	"scripts": {
-		"build": "bun run build:windows && bun run build:linux && bun run build:linux-arm && bun run build:mac-arm && bun run build:bundle",
-		"build:mac-arm": "bun build src/index.ts --compile --target=bun-darwin-arm64 --minify --sourcemap --outfile dist/macos/arm64/rwrap",
-		"build:linux-arm": "bun build src/index.ts --compile --target=bun-linux-arm64 --minify --sourcemap --outfile dist/linux/arm64/rwrap",
-		"build:linux": "bun build src/index.ts --compile --target=bun-linux-x64-modern  --minify --sourcemap --outfile dist/linux/amd64/rwrap",
-		"build:windows": "bun build src/index.ts --compile --target=bun-windows-x64-modern --minify --sourcemap --windows-icon=src/appIcon.ico --outfile dist/windows/amd64/rwrap.exe",
-		"build:windows-arm": "bun build src/index.ts --compile --target=bun-windows-arm64 --minify --sourcemap --windows-icon=src/appIcon.ico --outfile dist/windows/arm64/rwrap.exe",
-		"build:bundle": "bun build src/index.ts --minify --outfile dist/bundle.js",
-		"dev": "bun --watch run src/index.ts samples/f32.wav"
-	},
 	"author": "hexa0",
-	"license": "GPL-3.0",
-	"description": "Manually corrects looping VGM wave files to wrap the remainder on the second loop, this is made to primarily work with FL Studio so it may not work work with other DAWs",
-	"dependencies": {},
+	"main": "dist/index.js",
 	"devDependencies": {
 		"@types/bun": "^1.1.14"
+	},
+	"description": "Manually corrects looping VGM wave files to wrap the remainder on the second loop, this is made to primarily work with FL Studio so it may not work work with other DAWs",
+	"license": "GPL-3.0",
+	"scripts": {
+		"build": "bun run build:windows && bun run build:linux && bun run build:linux-arm && bun run build:mac-arm && bun run build:bundle",
+		"build:mac-arm": "bun build src/index.ts --compile --target=bun-darwin-arm64 --minify --sourcemap --outfile dist/macos/arm64/exportmarkers",
+		"build:linux-arm": "bun build src/index.ts --compile --target=bun-linux-arm64 --minify --sourcemap --outfile dist/linux/arm64/exportmarkers",
+		"build:linux": "bun build src/index.ts --compile --target=bun-linux-x64-modern  --minify --sourcemap --outfile dist/linux/amd64/exportmarkers",
+		"build:windows": "bun build src/index.ts --compile --target=bun-windows-x64-modern --minify --sourcemap --windows-icon=src/appIcon.ico --outfile dist/windows/amd64/exportmarkers.exe",
+		"build:windows-arm": "bun build src/index.ts --compile --target=bun-windows-arm64 --minify --sourcemap --windows-icon=src/appIcon.ico --outfile dist/windows/arm64/exportmarkers.exe",
+		"build:bundle": "bun build src/index.ts --target=bun --minify --outfile dist/bundle.js",
+		"dev": "bun --watch run src/index.ts samples/snd_place.wav"
+	},
+	"dependencies": {
+		"luadata": "^1.0.2"
 	}
 }

@@ -18,10 +18,10 @@ export function ReadWaveHeaders(buffer: Buffer): WaveFile {
 	const riffHeader = ReadRiffHeader(buffer);
 	assert(riffHeader.type === 1163280727, `Invalid type in RIFF header, expected 1163280727 got ${riffHeader.type}`);
 
-	const fmtChunk = riffHeader.chunks.get("fmt");
+	const fmtChunk = riffHeader.chunksByName.get("fmt");
 	assert(fmtChunk, `No fmt chunk found, WAVE is corrupted`);
 
-	const dataChunk = riffHeader.chunks.get("data");
+	const dataChunk = riffHeader.chunksByName.get("data");
 	assert(dataChunk, `No data chunk found, WAVE is corrupted`);
 
 	return {

@@ -129,6 +129,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# wrap-remainder-loop
+# wav-export-markers-to-json
 samples/
 bun.lockb

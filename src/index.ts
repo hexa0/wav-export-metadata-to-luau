@@ -1,5 +1,5 @@
 import { lastIndexOf } from "./util/string/lastIndexOf";
-import { RenderNewWave } from "./renderer";
+import { ExportMarkers } from "./renderer";
 import {
 	commandLineFlags,
 	inputFile,
@@ -20,11 +20,11 @@ if (!inputFile) {
 		audioToProcess.substring(
 			0,
 			lastIndexOf(audioToProcess, ".") || audioToProcess.length
-		) + " (looped).wav";
+		) + " (info).wav";
 
 	const fileBuffer = Buffer.from(await Bun.file(audioToProcess).bytes());
 	console.log("Processing");
-	RenderNewWave(fileBuffer, outputPath).catch((err) => {
+	ExportMarkers(fileBuffer, outputPath).catch((err) => {
 		console.error("Failed:");
 		console.error(err);
 		

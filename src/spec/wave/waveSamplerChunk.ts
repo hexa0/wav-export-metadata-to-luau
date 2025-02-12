@@ -3,8 +3,8 @@ import { RiffChunk } from "../riff";
 export interface SampleLoop {
 	identifier: number;
 	type: number;
-	start: number;
-	end: number;
+	startSample: number;
+	endSample: number;
 	fraction: number;
 	playCount: number;
 }
@@ -47,8 +47,8 @@ export function ReadWaveSamplerChunk(chunk: RiffChunk): WaveSamplerChunk {
 		const sampleLoop: SampleLoop = {
 			identifier: view.getUint32(offset + 0, true),
 			type: view.getUint32(offset + 4, true),
-			start: view.getUint32(offset + 8, true),
-			end: view.getUint32(offset + 12, true),
+			startSample: view.getUint32(offset + 8, true),
+			endSample: view.getUint32(offset + 12, true),
 			fraction: view.getUint32(offset + 16, true),
 			playCount: view.getUint32(offset + 20, true),
 		};
@@ -81,8 +81,8 @@ export function WriteWaveSamplerChunk(chunk: WaveSamplerChunk): Buffer {
 
 		view.setUint32(offset + 0, loop.identifier, true);
 		view.setUint32(offset + 4, loop.type, true);
-		view.setUint32(offset + 8, loop.start, true);
-		view.setUint32(offset + 12, loop.end, true);
+		view.setUint32(offset + 8, loop.startSample, true);
+		view.setUint32(offset + 12, loop.endSample, true);
 		view.setUint32(offset + 16, loop.fraction, true);
 		view.setUint32(offset + 20, loop.playCount, true);
 	}
