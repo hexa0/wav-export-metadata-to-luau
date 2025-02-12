@@ -11,11 +11,13 @@ export function ReadWaveAdtlSubChunk(chunk: RiffChunk): WaveAdtlSubChunk {
 
 	let chunkSearchOffset = 0;
 
+	console.log("scanning adtl")
+
 	while (true) {
 		const view = new DataView(chunk.buffer.buffer, chunkSearchOffset);
 
-		if (chunkSearchOffset >= (chunk.riffChunkEnd - chunk.riffChunkStart)) {
-			// console.log(`reached end of adtl`)
+		if ((chunkSearchOffset + 1) >= (chunk.riffChunkEnd - chunk.riffChunkStart)) {
+			console.log(`reached end of adtl`)
 			break;
 		}
 
@@ -23,8 +25,9 @@ export function ReadWaveAdtlSubChunk(chunk: RiffChunk): WaveAdtlSubChunk {
 
 		// labl in ascii is 1818386796
 		if (lablMagic !== 1818386796) {
-			throw `lablMagic is ${lablMagic} not 1818386796, file is corrupt!`
-			break;
+			// why is this standard fuck you riff
+			chunkSearchOffset += 1
+			continue
 		}
 		
 		const lablChunkSize = view.getUint32(4, true)
@@ -34,6 +37,8 @@ export function ReadWaveAdtlSubChunk(chunk: RiffChunk): WaveAdtlSubChunk {
 				chunk.buffer.subarray(chunkSearchOffset + 12, chunkSearchOffset + lablChunkSize + 7)
 			)
 		);
+
+		console.log(label)
 
 		lablSubChunk.labels.set(identifier, label)
 
