@@ -1,12 +1,12 @@
 {
-	"name": "wav-export-markers-to-json",
+	"name": "wav-export-metadata-to-luau",
 	"version": "1.0.0",
 	"author": "hexa0",
 	"main": "dist/index.js",
 	"devDependencies": {
 		"@types/bun": "^1.1.14"
 	},
-	"description": "Manually corrects looping VGM wave files to wrap the remainder on the second loop, this is made to primarily work with FL Studio so it may not work work with other DAWs",
+	"description": "export various wav metadata to a luau script & json file, i use this personally to grab markers from files i export from FL Studio",
 	"license": "GPL-3.0",
 	"scripts": {
 		"build": "bun run build:windows && bun run build:linux && bun run build:linux-arm && bun run build:mac-arm && bun run build:bundle",

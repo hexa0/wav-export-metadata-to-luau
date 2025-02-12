@@ -129,6 +129,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# wav-export-markers-to-json
+# wav-export-metadata-to-luau
 samples/
 bun.lockb
